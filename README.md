@@ -13,10 +13,53 @@ This script uses the API endpoint as defined here: https://docs.github.com/en/re
 *Rate limting info: https://docs.github.com/en/rest/overview/resources-in-the-rest-api#rate-limiting*
 
 
-Ruby installation required. Then run:
+You'll need Ruby installed on your system. Then run:
 
 ```bash
 ruby scraper.rb
 ```
 
 The script is interactive. You'll be asked for a GitHub username and associated repository. After the script is done, it will output emails in a textfile named `{{username}}-{{repository}}.txt`.
+
+## Example
+
+A regular scraping operation would look like this. The rate limit will be exceeded on large repositories:
+
+```
+$ ruby scraper.rb
+
++-------------------+
+|   GitHub          |
+|       Email       |
+|         Scraper   |
++-------------------+
+
+Enter a GitHub username:
+torvalds
+Enter a repository:
+linux
+Scraping https://github.com/torvalds/linux/
+Rate limit exceeded.
+Pages scraped: 59 out of 10447
+44 emails written to torvalds-linux.txt
+
+```
+
+If your current IP address is already rate limited, you'll run into this:
+
+```
++-------------------+
+|   GitHub          |
+|       Email       |
+|         Scraper   |
++-------------------+
+
+Enter a GitHub username:
+torvalds
+Enter a repository:
+linux
+Scraping https://github.com/torvalds/linux/
+Error, got status code 403
+Response message:
+API rate limit exceeded for <your-ip>. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)
+```

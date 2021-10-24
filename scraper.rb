@@ -8,7 +8,8 @@ puts '
 |   GitHub          |
 |       Email       |
 |         Scraper   |
-+-------------------+                                                   
++-------------------+  
+
 '
 
 puts 'Enter a GitHub username:'
@@ -23,28 +24,37 @@ page = 1
 last_page = 0
 
 uri = "https://api.github.com/repos/#{username}/#{repository}/commits?per_page=100&page=#{page}"
-puts uri
+
+puts "Scraping https://github.com/#{username}/#{repository}/"
 
 loop do
   response = Net::HTTP.get_response(URI(uri))
 
+  # check for other errors, such as rate limiting right off the bat or nonexistent repository
   if response.code != '200'
     puts "Error, got status code #{response.code}"
-    puts response.body
+    puts "Response message:"
+    puts JSON.parse(response.body)['message']
     exit
   end
 
+  # if response body is blank, that means the current page exceeds the last page (user error)
+  if response.body == '[]'
+    puts "Page exceeds final page of commits for repository."
+    exit
+  end
+
+  # get the last page so we don't loop past it
   last_page = response['Link'].split('&page=').last.split('>').first.to_i if last_page.zero?
 
-  json_response = JSON.parse(response.body) # convert to array of hashes
+  # convert to array of hashes
+  json_response = JSON.parse(response.body)
 
   json_response.each do |commit|
     emails << commit['commit']['author']['email']
   end
 
-  puts response.code
-  puts response['X-RateLimit-Remaining'].to_i
-
+  # if this is the last request available to us, break out of the loop
   if response['X-RateLimit-Remaining'].to_i.zero?
     puts 'Rate limit exceeded.'
     if emails.empty?
@@ -54,7 +64,9 @@ loop do
     break
   end
 
-  break if page == last_page
+  # don't go past the last page
+  break if page == last_page 
+
 
   page += 1
 end
@@ -77,4 +89,5 @@ end
 file.puts(output_emails)
 file.close
 
+puts "Pages scraped: #{page} out of #{last_page}"
 puts "#{output_emails.count} emails written to #{filename}"
