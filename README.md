@@ -26,7 +26,7 @@ The script is interactive. You'll be asked for a GitHub username and associated 
 A regular scraping operation would look like this. The rate limit will be exceeded on large repositories:
 
 ```
-$ ruby scraper.rb
+$ ruby main.rb
 
 +-------------------+
 |   GitHub          |
@@ -48,6 +48,8 @@ Pages scraped: 59 out of 10447
 If your current IP address is already rate limited, you'll run into this:
 
 ```
+$ ruby main.rb
+
 +-------------------+
 |   GitHub          |
 |       Email       |

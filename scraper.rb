@@ -3,91 +3,83 @@
 require 'net/http'
 require 'json'
 
-puts '
-+-------------------+
-|   GitHub          |
-|       Email       |
-|         Scraper   |
-+-------------------+  
-
-'
-
-puts 'Enter a GitHub username:'
-username = gets.chomp
-
-puts 'Enter a repository:'
-repository = gets.chomp
-
-emails = []
-
-page = 1
-last_page = 0
-
-uri = "https://api.github.com/repos/#{username}/#{repository}/commits?per_page=100&page=#{page}"
-
-puts "Scraping https://github.com/#{username}/#{repository}/"
-
-loop do
-  response = Net::HTTP.get_response(URI(uri))
-
-  # check for other errors, such as rate limiting right off the bat or nonexistent repository
-  if response.code != '200'
-    puts "Error, got status code #{response.code}"
-    puts "Response message:"
-    puts JSON.parse(response.body)['message']
-    exit
+class Scraper
+  def initialize(username, repository, page = 1)
+    @emails = []
+    @username = username
+    @repository = repository
+    @page = 1
+    @last_page = 0
+    @uri = "https://api.github.com/repos/#{username}/#{repository}/commits?per_page=100&page=#{page}"
   end
 
-  # if response body is blank, that means the current page exceeds the last page (user error)
-  if response.body == '[]'
-    puts "Page exceeds final page of commits for repository."
-    exit
-  end
+  def scrape_emails
+    puts "Scraping https://github.com/#{@username}/#{@repository}/"
 
-  # get the last page so we don't loop past it
-  last_page = response['Link'].split('&page=').last.split('>').first.to_i if last_page.zero?
+    loop do
+      response = Net::HTTP.get_response(URI(@uri))
 
-  # convert to array of hashes
-  json_response = JSON.parse(response.body)
+      # check for other errors, such as rate limiting right off the bat or nonexistent repository
+      if response.code != '200'
+        puts "Error, got status code #{response.code}"
+        puts 'Response message:'
+        puts JSON.parse(response.body)['message']
+        exit
+      end
 
-  json_response.each do |commit|
-    emails << commit['commit']['author']['email']
-  end
+      # if response body is blank, that means the current page exceeds the last page (user error)
+      if response.body == '[]'
+        puts 'Page exceeds final page of commits for repository.'
+        exit
+      end
 
-  # if this is the last request available to us, break out of the loop
-  if response['X-RateLimit-Remaining'].to_i.zero?
-    puts 'Rate limit exceeded.'
-    if emails.empty?
-      puts 'No emails scraped.'
-      exit
+      # get the last page so we don't loop past it
+      @last_page = response['Link'].split('&page=').last.split('>').first.to_i if @last_page.zero?
+
+      # convert to array of hashes
+      json_response = JSON.parse(response.body)
+
+      json_response.each do |commit|
+        @emails << commit['commit']['author']['email']
+      end
+
+      # if this is the last request available to us, break out of the loop
+      if response['X-RateLimit-Remaining'].to_i.zero?
+        puts 'Rate limit exceeded.'
+        if @emails.empty?
+          puts 'No emails scraped.'
+          exit
+        end
+        break
+      end
+
+      # don't go past the last page
+      break if @page >= @last_page
+
+      @page += 1
     end
-    break
   end
 
-  # don't go past the last page
-  break if page == last_page 
+  def output_emails
+    # output file
+    filename = "#{@username}-#{@repository}.txt"
+    file = File.open(filename, 'w')
 
+    @emails.uniq!
 
-  page += 1
+    output_emails = []
+
+    @emails.each do |email|
+      # filter out github emails @noreply.github.com
+      next if email =~ /noreply.github.com/
+
+      output_emails << email
+    end
+
+    file.puts(output_emails)
+    file.close
+
+    puts "Pages scraped: #{@page} out of #{@last_page}"
+    puts "#{output_emails.count} emails written to #{filename}"
+  end
 end
-
-# output file
-filename = "#{username}-#{repository}.txt"
-file = File.open(filename, 'w')
-
-emails.uniq!
-
-# filter out github emails @noreply.github.com
-output_emails = []
-
-emails.each do |email|
-  next if email =~ /noreply.github.com/
-
-  output_emails << email
-end
-
-file.puts(output_emails)
-file.close
-
-puts "Pages scraped: #{page} out of #{last_page}"
-puts "#{output_emails.count} emails written to #{filename}"
