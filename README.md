@@ -1,4 +1,4 @@
-# GitHub Email Harvester
+# GitHub Email Scraper
 
 Harvest contributor emails from a GitHub repository.
 
@@ -16,7 +16,7 @@ This script uses the API endpoint as defined here: https://docs.github.com/en/re
 You'll need Ruby installed on your system. Then run:
 
 ```bash
-ruby scraper.rb
+ruby main.rb
 ```
 
 The script is interactive. You'll be asked for a GitHub username and associated repository. After the script is done, it will output emails in a textfile named `{{username}}-{{repository}}.txt`.
