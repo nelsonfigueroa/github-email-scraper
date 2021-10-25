@@ -1,6 +1,6 @@
 # GitHub Email Scraper
 
-Harvest contributor emails from a GitHub repository.
+SCrap contributor emails from a GitHub repository.
 
 ## Disclaimer
 
