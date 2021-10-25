@@ -3,8 +3,6 @@
 require 'optparse'
 require_relative 'scraper'
 
-
-
 options = {}
 parser = OptionParser.new do |opts|
   opts.banner = 'Usage: example.rb [options]'
@@ -21,18 +19,16 @@ end
 parser.parse!
 
 if options.empty?
-	# show help if no arguments passed in
-	puts parser
-	exit
+  # show help if no arguments passed in
+  puts parser
+  exit
 end
-
 
 if !options['username'] || !options['repository']
-	puts "Missing argument."
-	puts parser
-	exit
+  puts 'Missing argument.'
+  puts parser
+  exit
 end
-
 
 puts '
 	+-------------------+
