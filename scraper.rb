@@ -4,11 +4,16 @@ require 'net/http'
 require 'json'
 
 class Scraper
-  def initialize(username, repository, page = 1)
+  def initialize(username, repository, page)
     @emails = []
     @username = username
     @repository = repository
-    @page = 1
+    # in the event that page is not provided, default to 1
+    if page.nil?
+      page = 1
+    end
+    @page = page
+    @starting_page = page
     @last_page = 0
     @uri = "https://api.github.com/repos/#{username}/#{repository}/commits?per_page=100&page=#{page}"
   end
@@ -34,7 +39,10 @@ class Scraper
       end
 
       # get the last page so we don't loop past it
-      @last_page = response['Link'].split('&page=').last.split('>').first.to_i if @last_page.zero?
+      @last_page = response['Link'].split(',')[1].split('=')[2].split('>')[0].to_i if @last_page.zero?
+
+      # don't go past the last page
+      break if @page > @last_page
 
       # convert to array of hashes
       json_response = JSON.parse(response.body)
@@ -52,9 +60,6 @@ class Scraper
         end
         break
       end
-
-      # don't go past the last page
-      break if @page >= @last_page
 
       @page += 1
     end
@@ -79,7 +84,7 @@ class Scraper
     file.puts(output_emails)
     file.close
 
-    puts "Pages scraped: #{@page} out of #{@last_page}"
+    puts "Pages scraped: #{@starting_page}-#{@page} out of #{@last_page}"
     puts "#{output_emails.count} emails written to #{filename}"
   end
 end

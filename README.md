@@ -18,7 +18,7 @@ This script uses the API endpoint as defined here: https://docs.github.com/en/re
 You'll need Ruby installed on your system. Then run:
 
 ```
-ruby main.rb -u <github-username> -r <github-repository>
+ruby main.rb -u <github-username> -r <github-repository> -p <commit-page>
 ```
 
 To see instructions directly in the command line, run:
@@ -29,11 +29,12 @@ $ ruby main.rb -h
 Usage: example.rb [options]
     -u, --username=USERNAME          Specify GitHub username
     -r, --repository=REPOSTORY       Specify GitHub repository
+    -p, --page=PAGE                  Specify the commit page to begin scraping from
 ```
 
 ## Examples
 
-A regular scraping operation would look like this. The rate limit will be exceeded on large repositories:
+A regular scraping operation would look like this. If you do not specify `-p`, the scraper will begin from page 1. The rate limit will be exceeded on large repositories:
 
 ```
 $ ruby main.rb -u torvalds -r linux
@@ -47,12 +48,30 @@ $ ruby main.rb -u torvalds -r linux
 
 Scraping https://github.com/torvalds/linux/
 Rate limit exceeded.
-Pages scraped: 58 out of 10447
+Pages scraped: 1-58 out of 10447
 43 emails written to torvalds-linux.txt
 
 ```
 
-If your current IP address is already rate limited, you'll run into this:
+An example that specifies the page of commits to begin scraping from:
+
+```
+$ ruby main.rb -u torvalds -r linux -p 100
+
+	+-------------------+
+	|   GitHub          |
+	|       Email       |
+	|         Scraper   |
+	+-------------------+
+
+
+Scraping https://github.com/torvalds/linux/
+Rate limit exceeded.
+Pages scraped: 100-159 out of 10447
+39 emails written to torvalds-linux.txt
+```
+
+An example where the IP address is rate limited:
 
 ```
 $ ruby main.rb -u torvalds -r linux
