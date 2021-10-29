@@ -17,8 +17,8 @@ parser = OptionParser.new do |opts|
 
   opts.on('-p', '--page=PAGE', 'Specify the commit page to begin scraping from') do |p|
     p = p.to_i # if a string is input, this will convert to 0
-    if p == 0
-      p +=1 # we want to start at page 1
+    if p.zero?
+      p += 1 # we want to start at page 1
     end
     options['page'] = p
   end
@@ -32,13 +32,13 @@ if options.empty?
   exit
 end
 
-if !options['username']
+unless options['username']
   puts 'Missing username argument.'
   puts parser
   exit
 end
 
-if !options['repository']
+unless options['repository']
   puts 'Missing repository argument.'
   puts parser
   exit
