@@ -9,7 +9,7 @@ class Scraper
     @username = username
     @repository = repository
     @page = page || 1 # in the event that page is not provided, default to 1
-    @starting_page = page
+    @starting_page = @page
     @last_page = 0
     @uri = "https://api.github.com/repos/#{username}/#{repository}/commits?per_page=100&page=#{page}"
   end
@@ -38,7 +38,11 @@ class Scraper
       @last_page = response['Link'].split(',')[1].split('=')[2].split('>')[0].to_i if @last_page.zero?
 
       # don't go past the last page
-      break if @page > @last_page
+      if @page > @last_page
+        # subtract from @page to provide user with the actual pages scraped
+        @page -= 1
+        break
+      end
 
       # convert to array of hashes
       json_response = JSON.parse(response.body)
