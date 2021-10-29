@@ -8,11 +8,7 @@ class Scraper
     @emails = []
     @username = username
     @repository = repository
-    # in the event that page is not provided, default to 1
-    if page.nil?
-      page = 1
-    end
-    @page = page
+    @page = page || 1 # in the event that page is not provided, default to 1
     @starting_page = page
     @last_page = 0
     @uri = "https://api.github.com/repos/#{username}/#{repository}/commits?per_page=100&page=#{page}"
@@ -24,7 +20,7 @@ class Scraper
     loop do
       response = Net::HTTP.get_response(URI(@uri))
 
-      # check for other errors, such as rate limiting right off the bat or nonexistent repository
+      # check for other errors, such as rate limiting or nonexistent repository
       if response.code != '200'
         puts "Error, got status code #{response.code}"
         puts 'Response message:'
