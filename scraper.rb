@@ -34,21 +34,26 @@ class Scraper
         exit
       end
 
+      # if 'rel="last"' is missing, that means the current page is the last page
+      # handles edge case where input page 'p' is the last page
+      unless response['Link'] =~ /rel="last"/
+        puts "rel=last is missing"
+        @last_page = @page
+      end
+
       # get the last page so we don't loop past it
       @last_page = response['Link'].split(',')[1].split('=')[2].split('>')[0].to_i if @last_page.zero?
-
-      # don't go past the last page
-      if @page > @last_page
-        # subtract from @page to provide user with the actual pages scraped
-        @page -= 1
-        break
-      end
 
       # convert to array of hashes
       json_response = JSON.parse(response.body)
 
       json_response.each do |commit|
         @emails << commit['commit']['author']['email']
+      end
+
+      # don't go past the last page
+      if @page == @last_page
+        break
       end
 
       # if this is the last request available to us, break out of the loop
