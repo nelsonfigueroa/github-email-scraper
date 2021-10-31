@@ -34,7 +34,7 @@ class Scraper
         exit
       end
 
-      # if 'rel="last"' is missing, that means the current page is the last page
+      # if 'rel="last"' is missing from the header, that means the current page is the last page
       # handles edge case where input page 'p' is the last page
       unless response['Link'] =~ /rel="last"/
         @last_page = @page
