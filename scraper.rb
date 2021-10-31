@@ -37,7 +37,6 @@ class Scraper
       # if 'rel="last"' is missing, that means the current page is the last page
       # handles edge case where input page 'p' is the last page
       unless response['Link'] =~ /rel="last"/
-        puts "rel=last is missing"
         @last_page = @page
       end
 
@@ -52,9 +51,7 @@ class Scraper
       end
 
       # don't go past the last page
-      if @page == @last_page
-        break
-      end
+      break if @page == @last_page
 
       # if this is the last request available to us, break out of the loop
       if response['X-RateLimit-Remaining'].to_i.zero?
