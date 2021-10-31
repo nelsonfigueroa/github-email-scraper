@@ -2,9 +2,13 @@
 
 Scrape contributor emails from a GitHub repository.
 
+## Motivation
+
+I noticed that the GitHub API exposes email addresses used in commits. I wanted to see how easily someone could scrape for emails using a script. I talk about GitHub email scraping and protecting yourself in a [blog post](https://nelsonfigueroa.sh/scraping-github-contributor-emails/).
+
 ## Disclaimer
 
-This was created for demonstration purposes. What you do with this script or emails gathered is purely your responsibility.
+This was created for demonstrational purposes. What you do with this script or emails gathered is purely your responsibility.
 
 ## Usage
 
