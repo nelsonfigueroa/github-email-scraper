@@ -2,6 +2,16 @@
 
 Scrape contributor emails from a GitHub repository.
 
+## Note
+
+I found a better way of doing this with a CLI command instead of this Ruby script: https://nelson.cloud/scrape-contributor-emails-from-any-git-repository/
+
+tldr: just run this command within a git directory:
+
+```shell
+git shortlog -sea | grep -E -o "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}\b" | awk '{print tolower($0)}' | sort | uniq | grep -wv 'users.noreply.github.com'
+```
+
 ## Motivation
 
 I noticed that the GitHub API exposes email addresses used in commits. I wanted to see how easily someone could scrape for emails using a script. I talk about GitHub email scraping and protecting yourself in a [blog post](https://nelsonfigueroa.sh/scraping-github-contributor-emails/).
