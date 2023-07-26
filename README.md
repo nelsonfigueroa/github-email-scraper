@@ -14,7 +14,7 @@ git shortlog -sea | grep -E -o "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6
 
 ## Motivation
 
-I noticed that the GitHub API exposes email addresses used in commits. I wanted to see how easily someone could scrape for emails using a script. I talk about GitHub email scraping and protecting yourself in a [blog post](https://nelsonfigueroa.sh/scraping-github-contributor-emails/).
+I noticed that the GitHub API exposes email addresses used in commits. I wanted to see how easily someone could scrape for emails using a script. I talk about GitHub email scraping and protecting yourself in a [blog post](https://nelson.cloud/scraping-github-contributor-emails/).
 
 ## Disclaimer
 
